@@ -1,12 +1,15 @@
 package io.github.hathibelagal.eidetic;
 
+import android.animation.Animator;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int WIN = 1;
     private static final int LOSE = 0;
-    final private int nButtons = 3;
+    final private int nRows = 3;
+    final private int nCols = 3;
     final private ArrayList<Button> buttons = new ArrayList<>(9);
     final private List<Integer> sequence = IntStream.range(1, 10).boxed().collect(Collectors.toList());
     final private ToneGenerator toneGenerator = new ToneGenerator(ToneGenerator.TONE_DTMF_0, 70);
@@ -60,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void createButtons() {
         int k = 0;
-        for (int i = 0; i < nButtons; i++) {
-            for (int j = 0; j < nButtons; j++) {
+        for (int i = 0; i < nRows; i++) {
+            for (int j = 0; j < nCols; j++) {
                 NumberButton b = new NumberButton(MainActivity.this);
                 b.setText(String.valueOf(sequence.get(k)));
                 b.setValue(sequence.get(k));
@@ -74,13 +78,10 @@ public class MainActivity extends AppCompatActivity {
 
                 b.setLayoutParams(gridParams);
                 b.setOnClickListener(view -> {
+                    Log.d("EIDETIC", String.format("%d", expectedNumber));
                     if (!gameStarted && b.getValue() != expectedNumber) {
                         toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
-                        Toast.makeText(
-                                MainActivity.this,
-                                "Please start with 1",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (b.getValue() == expectedNumber) {
@@ -89,28 +90,49 @@ public class MainActivity extends AppCompatActivity {
                             activatePuzzleMode();
                         }
                         expectedNumber += 1;
-                        toneGenerator.stopTone();
-                        toneGenerator.startTone(b.getValue(), 100);
-                        b.setVisibility(View.INVISIBLE);
+                        playTone(b.getValue(), false);
+                        b.animate().setDuration(200).scaleX(0).scaleY(0).setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(@NonNull Animator animator) {
 
-                        if (expectedNumber == nButtons * 2 + 1) {
-                            toneGenerator.stopTone();
-                            toneGenerator.startTone(ToneGenerator.TONE_DTMF_A, 200);
+                            }
+
+                            @Override
+                            public void onAnimationEnd(@NonNull Animator animator) {
+                                b.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(@NonNull Animator animator) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(@NonNull Animator animator) {
+
+                            }
+                        });
+
+                        if (expectedNumber == nCols * nRows + 1) {
+                            playTone(ToneGenerator.TONE_DTMF_A, true);
                             showRestart(WIN);
                         }
                     } else {
-                        toneGenerator.stopTone();
-                        toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 200);
+                        playTone(ToneGenerator.TONE_DTMF_0, true);
                         data.resetStreak();
                         showRestart(LOSE);
                     }
-                });
-                buttons.add(b);
+                }); buttons.add(b);
                 grid.addView(b);
 
                 k++;
             }
         }
+    }
+
+    private void playTone(int tone, boolean isLong) {
+        toneGenerator.stopTone();
+        toneGenerator.startTone(tone, isLong ? 200 : 100);
     }
 
     private void showRestart(int status) {
@@ -122,21 +144,8 @@ public class MainActivity extends AppCompatActivity {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
-        builder.setMessage(
-                status == WIN ?
-                        String.format(Locale.ENGLISH,
-                                getString(
-                                        createdRecord ?
-                                                R.string.success_message_record
-                                                : R.string.success_message
-                                ),
-                                timeTaken,
-                                data.getFastestTime()
-                        ) :
-                        getString(R.string.game_over_message)
-        );
-        builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak())
-                : "😖 Game over!");
+        builder.setMessage(status == WIN ? String.format(Locale.ENGLISH, getString(createdRecord ? R.string.success_message_record : R.string.success_message), timeTaken, data.getFastestTime()) : getString(R.string.game_over_message));
+        builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak()) : "😖 Game over!");
         builder.setPositiveButton("Yes", (dialogInterface, i) -> resetGrid());
 
         builder.setNegativeButton("No", (dialogInterface, i) -> finish());
