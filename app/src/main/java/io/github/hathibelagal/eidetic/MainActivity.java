@@ -1,6 +1,9 @@
 package io.github.hathibelagal.eidetic;
 
 import android.animation.Animator;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.media.ToneGenerator;
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     taken.add(new Point(i, j));
                     NumberButton b = new NumberButton(MainActivity.this);
-                    b.setText(String.valueOf(sequence.get(k)));
+                    b.setText(getMappedString(sequence.get(k)));
                     b.setValue(sequence.get(k));
 
                     GridLayout.LayoutParams gridParams = new GridLayout.LayoutParams();
@@ -153,6 +156,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private CharSequence getMappedString(int i) {
+        switch(data.getLanguage()) {
+            case 1: return LangUtils.getHindi(i);
+            case 2: return LangUtils.getJapanese(i);
+            case 0:
+            default:
+                return String.valueOf(i);
+        }
+    }
+
     private void playTone(int tone, boolean isLong) {
         toneGenerator.stopTone();
         toneGenerator.startTone(tone, isLong ? 200 : 100);
@@ -200,8 +213,32 @@ public class MainActivity extends AppCompatActivity {
             resetGrid();
         }
         if(item.getItemId() == R.id.menu_language) {
-
+            showChangeLanguageDialog();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showChangeLanguageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Change language to...");
+        builder.setItems(new CharSequence[]{"English", "Hindi", "Japanese"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                data.setLanguage(i);
+                for(Button b: buttons) {
+                    int v = ((NumberButton)b).getValue();
+                    b.setText(getMappedString(v));
+                }
+            }
+        });
+        builder.create().show();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        Configuration c = new Configuration(newBase.getResources().getConfiguration());
+        c.fontScale = 1.0f;
+        applyOverrideConfiguration(c);
+        super.attachBaseContext(newBase);
     }
 }

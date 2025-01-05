@@ -16,6 +16,14 @@ public class SavedData {
         prefs.edit().putInt("STREAK", currentStreak).apply();
     }
 
+    void setLanguage(int l) {
+        prefs.edit().putInt("LANGUAGE", l).apply();
+    }
+
+    int getLanguage() {
+        return prefs.getInt("LANGUAGE", 0);
+    }
+
     void resetStreak() {
         prefs.edit().remove("STREAK").apply();
     }
