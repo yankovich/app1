@@ -2,6 +2,7 @@ package io.github.hathibelagal.eidetic;
 
 import android.animation.Animator;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,9 +26,10 @@ import java.util.stream.IntStream;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int MAX_VALUE = 9;
     private static final int WIN = 1;
     private static final int LOSE = 0;
-    final private int nRows = 3;
+    final private int nRows = 6;
     final private int nCols = 3;
     final private ArrayList<Button> buttons = new ArrayList<>(9);
     final private List<Integer> sequence = IntStream.range(1, 10).boxed().collect(Collectors.toList());
@@ -68,68 +70,83 @@ public class MainActivity extends AppCompatActivity {
 
     private void createButtons() {
         int k = 0;
-        for (int i = 0; i < nRows; i++) {
-            for (int j = 0; j < nCols; j++) {
-                NumberButton b = new NumberButton(MainActivity.this);
-                b.setText(String.valueOf(sequence.get(k)));
-                b.setValue(sequence.get(k));
-
-                GridLayout.LayoutParams gridParams = new GridLayout.LayoutParams();
-                gridParams.height = 0;
-                gridParams.width = 0;
-                gridParams.rowSpec = GridLayout.spec(i, 1f);
-                gridParams.columnSpec = GridLayout.spec(j, 1f);
-
-                b.setLayoutParams(gridParams);
-                b.setOnClickListener(view -> {
-                    Log.d("EIDETIC", String.format("%d", expectedNumber));
-                    if (!gameStarted && b.getValue() != expectedNumber) {
-                        toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
-                        Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
+        List<Point> taken = new ArrayList<>();
+        while(true) {
+            ROWS: for (int i = 0; i < nRows; i++) {
+                COLS: for (int j = 0; j < nCols; j++) {
+                    if(k >= MAX_VALUE) {
                         return;
                     }
-                    if (b.getValue() == expectedNumber) {
-                        if (!gameStarted) {
-                            gameStarted = true;
-                            activatePuzzleMode();
-                        }
-                        expectedNumber += 1;
-                        playTone(b.getValue(), false);
-                        b.animate().setDuration(200).scaleX(0).scaleY(0).setListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(@NonNull Animator animator) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(@NonNull Animator animator) {
-                                b.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onAnimationCancel(@NonNull Animator animator) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(@NonNull Animator animator) {
-
-                            }
-                        });
-
-                        if (expectedNumber == nCols * nRows + 1) {
-                            playTone(ToneGenerator.TONE_DTMF_A, true);
-                            showRestart(WIN);
-                        }
-                    } else {
-                        playTone(ToneGenerator.TONE_DTMF_0, true);
-                        data.resetStreak();
-                        showRestart(LOSE);
+                    if(Math.random() > 0.5) {
+                        continue;
                     }
-                }); buttons.add(b);
-                grid.addView(b);
+                    for(Point p: taken) {
+                        if(p.x == i && p.y == j) {
+                            continue COLS;
+                        }
+                    }
+                    taken.add(new Point(i, j));
+                    NumberButton b = new NumberButton(MainActivity.this);
+                    b.setText(String.valueOf(sequence.get(k)));
+                    b.setValue(sequence.get(k));
 
-                k++;
+                    GridLayout.LayoutParams gridParams = new GridLayout.LayoutParams();
+                    gridParams.height = 0;
+                    gridParams.width = 0;
+                    gridParams.rowSpec = GridLayout.spec(i, 1f);
+                    gridParams.columnSpec = GridLayout.spec(j, 1f);
+
+                    b.setLayoutParams(gridParams);
+                    b.setOnClickListener(view -> {
+                        Log.d("EIDETIC", String.format("%d", expectedNumber));
+                        if (!gameStarted && b.getValue() != expectedNumber) {
+                            toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
+                            Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (b.getValue() == expectedNumber) {
+                            if (!gameStarted) {
+                                gameStarted = true;
+                                activatePuzzleMode();
+                            }
+                            expectedNumber += 1;
+                            playTone(b.getValue(), false);
+                            b.animate().setDuration(200).scaleX(0).scaleY(0).setListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(@NonNull Animator animator) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(@NonNull Animator animator) {
+                                    b.setVisibility(View.INVISIBLE);
+                                }
+
+                                @Override
+                                public void onAnimationCancel(@NonNull Animator animator) {
+
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(@NonNull Animator animator) {
+
+                                }
+                            });
+
+                            if (expectedNumber == nCols * nRows + 1) {
+                                playTone(ToneGenerator.TONE_DTMF_A, true);
+                                showRestart(WIN);
+                            }
+                        } else {
+                            playTone(ToneGenerator.TONE_DTMF_0, true);
+                            data.resetStreak();
+                            showRestart(LOSE);
+                        }
+                    }); buttons.add(b);
+                    grid.addView(b);
+
+                    k++;
+                }
             }
         }
     }
