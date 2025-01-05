@@ -1,6 +1,7 @@
 package io.github.hathibelagal.eidetic;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -10,7 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.Toast;
@@ -30,9 +33,9 @@ import java.util.stream.IntStream;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int MAX_VALUE = 9;
     private static final int WIN = 1;
     private static final int LOSE = 0;
+    private final int MAX_VALUE = 9;
     final private int nRows = 6;
     final private int nCols = 3;
     final private ArrayList<Button> buttons = new ArrayList<>(9);
@@ -51,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         data = new SavedData(this);
         grid = findViewById(R.id.grid);
         gridContainer = findViewById(R.id.grid_container);
@@ -72,20 +78,22 @@ public class MainActivity extends AppCompatActivity {
         Collections.shuffle(sequence);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void createButtons() {
         int k = 0;
         List<Point> taken = new ArrayList<>();
-        while(true) {
-            ROWS: for (int i = 0; i < nRows; i++) {
-                COLS: for (int j = 0; j < nCols; j++) {
-                    if(k >= MAX_VALUE) {
+        while (true) {
+            for (int i = 0; i < nRows; i++) {
+                COLS:
+                for (int j = 0; j < nCols; j++) {
+                    if (k >= MAX_VALUE) {
                         return;
                     }
-                    if(Math.random() > 0.5) {
+                    if (Math.random() > 0.5) {
                         continue;
                     }
-                    for(Point p: taken) {
-                        if(p.x == i && p.y == j) {
+                    for (Point p : taken) {
+                        if (p.x == i && p.y == j) {
                             continue COLS;
                         }
                     }
@@ -101,53 +109,37 @@ public class MainActivity extends AppCompatActivity {
                     gridParams.columnSpec = GridLayout.spec(j, 1f);
 
                     b.setLayoutParams(gridParams);
-                    b.setOnClickListener(view -> {
-                        Log.d("EIDETIC", String.format("%d", expectedNumber));
-                        if (!gameStarted && b.getValue() != expectedNumber) {
-                            toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
-                            Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        b.setOnClickListener(null);
-                        if (b.getValue() == expectedNumber) {
-                            if (!gameStarted) {
-                                gameStarted = true;
-                                activatePuzzleMode();
+                    b.setOnTouchListener((view, motionEvent) -> {
+                        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                            if (!gameStarted && b.getValue() != expectedNumber) {
+                                toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
+                                Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
+                                return true;
                             }
-                            expectedNumber += 1;
-                            playTone(b.getValue(), false);
-                            b.animate().setDuration(200).scaleX(0).scaleY(0).setListener(new Animator.AnimatorListener() {
-                                @Override
-                                public void onAnimationStart(@NonNull Animator animator) {
+                            b.setOnTouchListener(null);
 
+                            if (b.getValue() == expectedNumber) {
+                                if (!gameStarted) {
+                                    gameStarted = true;
+                                    MainActivity.this.activatePuzzleMode();
                                 }
+                                expectedNumber += 1;
+                                MainActivity.this.playTone(b.getValue(), false);
+                                b.setVisibility(View.INVISIBLE);
 
-                                @Override
-                                public void onAnimationEnd(@NonNull Animator animator) {
-                                    b.setVisibility(View.INVISIBLE);
+                                if (expectedNumber == MAX_VALUE + 1) {
+                                    MainActivity.this.playTone(ToneGenerator.TONE_DTMF_A, true);
+                                    MainActivity.this.showRestart(WIN);
                                 }
-
-                                @Override
-                                public void onAnimationCancel(@NonNull Animator animator) {
-
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(@NonNull Animator animator) {
-
-                                }
-                            });
-
-                            if (expectedNumber == MAX_VALUE + 1) {
-                                playTone(ToneGenerator.TONE_DTMF_A, true);
-                                showRestart(WIN);
+                            } else {
+                                MainActivity.this.playTone(ToneGenerator.TONE_DTMF_0, true);
+                                data.resetStreak();
+                                MainActivity.this.showRestart(LOSE);
                             }
-                        } else {
-                            playTone(ToneGenerator.TONE_DTMF_0, true);
-                            data.resetStreak();
-                            showRestart(LOSE);
                         }
-                    }); buttons.add(b);
+                        return true;
+                    });
+                    buttons.add(b);
                     grid.addView(b);
 
                     k++;
@@ -166,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showRestart(int status) {
-        if(status == WIN) {
+        if (status == WIN) {
             gridContainer.setBackgroundColor(getColor(R.color.win));
         } else {
             gridContainer.setBackgroundColor(getColor(R.color.lose));
@@ -202,11 +194,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.menu_reload) {
+        if (item.getItemId() == R.id.menu_reload) {
             data.resetStreak();
             resetGrid();
         }
-        if(item.getItemId() == R.id.menu_language) {
+        if (item.getItemId() == R.id.menu_language) {
             showChangeLanguageDialog();
         }
         return super.onOptionsItemSelected(item);
@@ -215,13 +207,11 @@ public class MainActivity extends AppCompatActivity {
     private void showChangeLanguageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Change language to...");
-        builder.setItems(new CharSequence[]{
-                "English", "Hindi", "Japanese", "Khmer"
-        }, (dialogInterface, i) -> {
+        builder.setItems(new CharSequence[]{"English", "Hindi", "Japanese", "Khmer"}, (dialogInterface, i) -> {
             data.setLanguage(i);
-            if(!gameStarted) {
-                for(Button b: buttons) {
-                    int v = ((NumberButton)b).getValue();
+            if (!gameStarted) {
+                for (Button b : buttons) {
+                    int v = ((NumberButton) b).getValue();
                     b.setText(getMappedString(v));
                 }
             }

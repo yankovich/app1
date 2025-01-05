@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="win">#009900</color>
     <color name="lose">#990000</color>
+    <color name="game">#121212</color>
 </resources>
