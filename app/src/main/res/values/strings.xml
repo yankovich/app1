@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Eidetic</string>
     <string name="success_message">You took %d seconds.\nYour best time was %d seconds.\n\nReady to play again?</string>
-    <string name="success_message_record">💡New record created!\n\nYou took just %d seconds.\nYour previous best time was %d seconds.\n\nReady to play again?</string>
+    <string name="success_message_record">New record created!\n\nYou took just %d seconds.\nYour previous best time was %d seconds.\n\nReady to play again?</string>
     <string name="game_over_message">Do you want to try again?</string>
 </resources>

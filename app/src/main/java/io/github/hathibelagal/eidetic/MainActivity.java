@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
             createdRecord = data.updateFastestTime(timeTaken);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
         builder.setMessage(
                 status == WIN ?
                         String.format(Locale.ENGLISH,
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                         ) :
                         getString(R.string.game_over_message)
         );
-        builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win! Streak: %d", data.getStreak())
+        builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak())
                 : "😖 Game over!");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
