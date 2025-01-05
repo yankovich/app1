@@ -1,6 +1,7 @@
 package io.github.hathibelagal.eidetic;
 
 import android.animation.Animator;
+import android.graphics.Color;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean gameStarted = false;
     private int expectedNumber = 1;
     private GridLayout grid;
+    private View gridContainer;
 
     private long startTime = 0;
 
@@ -45,10 +47,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         data = new SavedData(this);
         grid = findViewById(R.id.grid);
+        gridContainer = findViewById(R.id.grid_container);
         resetGrid();
     }
 
     private void resetGrid() {
+        gridContainer.setBackgroundColor(Color.parseColor("#121212"));
         startTime = new Date().getTime();
         grid.removeAllViews();
         buttons.clear();
@@ -136,6 +140,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showRestart(int status) {
+        if(status == WIN) {
+            gridContainer.setBackgroundColor(getColor(R.color.win));
+        } else {
+            gridContainer.setBackgroundColor(getColor(R.color.lose));
+        }
         int timeTaken = (int) TimeUnit.MILLISECONDS.toSeconds(new Date().getTime() - startTime);
         boolean createdRecord = false;
         if (status == WIN) {
