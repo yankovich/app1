@@ -2,12 +2,14 @@ package io.github.hathibelagal.eidetic;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.ToneGenerator;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.res.ResourcesCompat;
 
 public class NumberButton extends androidx.appcompat.widget.AppCompatButton {
 
@@ -23,7 +25,7 @@ public class NumberButton extends androidx.appcompat.widget.AppCompatButton {
 
     public NumberButton(Context context) {
         super(context);
-        setTextSize(24f);
+        setTextSize(56f);
         setTextColor(Color.WHITE);
         setBackground(AppCompatResources.getDrawable(context, R.drawable.number_button_ready));
     }

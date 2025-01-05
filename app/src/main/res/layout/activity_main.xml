@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    android:background="#121212">
+    android:background="#121212"
+    android:padding="16dp">
 
     <GridLayout
         android:layout_width="match_parent"
@@ -14,6 +15,7 @@
         android:rowCount="3"
         android:columnCount="3"
         android:useDefaultMargins="true"
+        android:alpha="0.8"
         />
 
 </LinearLayout>
