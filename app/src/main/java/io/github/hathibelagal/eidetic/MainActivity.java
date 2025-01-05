@@ -2,7 +2,6 @@ package io.github.hathibelagal.eidetic;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -109,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
                             return;
                         }
+                        b.setOnClickListener(null);
                         if (b.getValue() == expectedNumber) {
                             if (!gameStarted) {
                                 gameStarted = true;
@@ -157,13 +157,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private CharSequence getMappedString(int i) {
-        switch(data.getLanguage()) {
-            case 1: return LangUtils.getHindi(i);
-            case 2: return LangUtils.getJapanese(i);
-            case 0:
-            default:
-                return String.valueOf(i);
-        }
+        return LangUtils.getTranslation(data.getLanguage(), i);
     }
 
     private void playTone(int tone, boolean isLong) {
@@ -221,10 +215,11 @@ public class MainActivity extends AppCompatActivity {
     private void showChangeLanguageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Change language to...");
-        builder.setItems(new CharSequence[]{"English", "Hindi", "Japanese"}, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                data.setLanguage(i);
+        builder.setItems(new CharSequence[]{
+                "English", "Hindi", "Japanese", "Khmer"
+        }, (dialogInterface, i) -> {
+            data.setLanguage(i);
+            if(!gameStarted) {
                 for(Button b: buttons) {
                     int v = ((NumberButton)b).getValue();
                     b.setText(getMappedString(v));
