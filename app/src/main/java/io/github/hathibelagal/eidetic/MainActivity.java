@@ -1,7 +1,5 @@
 package io.github.hathibelagal.eidetic;
 
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.view.View;
@@ -12,14 +10,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -78,39 +73,36 @@ public class MainActivity extends AppCompatActivity {
                 gridParams.columnSpec = GridLayout.spec(j, 1f);
 
                 b.setLayoutParams(gridParams);
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (!gameStarted && b.getValue() != expectedNumber) {
-                            toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
-                            Toast.makeText(
-                                    MainActivity.this,
-                                    "Please start with 1",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                            return;
+                b.setOnClickListener(view -> {
+                    if (!gameStarted && b.getValue() != expectedNumber) {
+                        toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
+                        Toast.makeText(
+                                MainActivity.this,
+                                "Please start with 1",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+                    if (b.getValue() == expectedNumber) {
+                        if (!gameStarted) {
+                            gameStarted = true;
+                            activatePuzzleMode();
                         }
-                        if (b.getValue() == expectedNumber) {
-                            if (!gameStarted) {
-                                gameStarted = true;
-                                activatePuzzleMode();
-                            }
-                            expectedNumber += 1;
-                            toneGenerator.stopTone();
-                            toneGenerator.startTone(b.getValue(), 100);
-                            b.setVisibility(View.INVISIBLE);
+                        expectedNumber += 1;
+                        toneGenerator.stopTone();
+                        toneGenerator.startTone(b.getValue(), 100);
+                        b.setVisibility(View.INVISIBLE);
 
-                            if (expectedNumber == 10) {
-                                toneGenerator.stopTone();
-                                toneGenerator.startTone(ToneGenerator.TONE_DTMF_A, 200);
-                                showRestart(WIN);
-                            }
-                        } else {
+                        if (expectedNumber == nButtons * 2 + 1) {
                             toneGenerator.stopTone();
-                            toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 200);
-                            data.resetStreak();
-                            showRestart(LOSE);
+                            toneGenerator.startTone(ToneGenerator.TONE_DTMF_A, 200);
+                            showRestart(WIN);
                         }
+                    } else {
+                        toneGenerator.stopTone();
+                        toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 200);
+                        data.resetStreak();
+                        showRestart(LOSE);
                     }
                 });
                 buttons.add(b);
@@ -122,9 +114,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showRestart(int status) {
-        int timeTaken = (int)TimeUnit.MILLISECONDS.toSeconds(new Date().getTime() - startTime);
+        int timeTaken = (int) TimeUnit.MILLISECONDS.toSeconds(new Date().getTime() - startTime);
         boolean createdRecord = false;
-        if(status == WIN) {
+        if (status == WIN) {
             data.incrementStreak();
             createdRecord = data.updateFastestTime(timeTaken);
         }
@@ -133,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(
                 status == WIN ?
                         String.format(Locale.ENGLISH,
-                                 getString(
-                                         createdRecord ?
-                                                 R.string.success_message_record
-                                                 : R.string.success_message
-                                 ),
+                                getString(
+                                        createdRecord ?
+                                                R.string.success_message_record
+                                                : R.string.success_message
+                                ),
                                 timeTaken,
                                 data.getFastestTime()
                         ) :
@@ -145,19 +137,9 @@ public class MainActivity extends AppCompatActivity {
         );
         builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak())
                 : "😖 Game over!");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                resetGrid();
-            }
-        });
+        builder.setPositiveButton("Yes", (dialogInterface, i) -> resetGrid());
 
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                finish();
-            }
-        });
+        builder.setNegativeButton("No", (dialogInterface, i) -> finish());
 
         builder.create().show();
     }
