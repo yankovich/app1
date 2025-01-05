@@ -6,6 +6,8 @@ import android.graphics.Point;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
 
-                            if (expectedNumber == nCols * nRows + 1) {
+                            if (expectedNumber == MAX_VALUE + 1) {
                                 playTone(ToneGenerator.TONE_DTMF_A, true);
                                 showRestart(WIN);
                             }
@@ -183,5 +185,23 @@ public class MainActivity extends AppCompatActivity {
         for (Button b : buttons) {
             b.setText("?");
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.game_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.menu_reload) {
+            data.resetStreak();
+            resetGrid();
+        }
+        if(item.getItemId() == R.id.menu_language) {
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

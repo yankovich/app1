@@ -25,7 +25,7 @@ public class NumberButton extends androidx.appcompat.widget.AppCompatButton {
 
     public NumberButton(Context context) {
         super(context);
-        setTextSize(56f);
+        setTextSize(52f);
         setTextColor(Color.WHITE);
         setBackground(AppCompatResources.getDrawable(context, R.drawable.number_button_ready));
     }
