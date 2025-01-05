@@ -5,4 +5,6 @@
     <string name="game_over_message">Do you want to try again?</string>
     <string name="menu_reload_title">Reload</string>
     <string name="menu_change_language_title">Change language</string>
+    <string name="menu_star_1">Star 1</string>
+    <string name="menu_star_2">Star 2</string>
 </resources>

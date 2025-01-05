@@ -1,14 +1,11 @@
 package io.github.hathibelagal.eidetic;
 
-import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.media.ToneGenerator;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -64,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetGrid() {
-        gridContainer.setBackgroundColor(Color.parseColor("#121212"));
+        invalidateOptionsMenu();
+        gridContainer.setBackgroundColor(getColor(R.color.game));
         startTime = new Date().getTime();
         grid.removeAllViews();
         buttons.clear();
@@ -110,15 +108,15 @@ public class MainActivity extends AppCompatActivity {
 
                     b.setLayoutParams(gridParams);
                     b.setOnTouchListener((view, motionEvent) -> {
-                        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                             if (!gameStarted && b.getValue() != expectedNumber) {
                                 toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
                                 Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
                                 return true;
                             }
-                            b.setOnTouchListener(null);
 
                             if (b.getValue() == expectedNumber) {
+                                b.setOnTouchListener(null);
                                 if (!gameStarted) {
                                     gameStarted = true;
                                     MainActivity.this.activatePuzzleMode();
@@ -133,8 +131,14 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             } else {
                                 MainActivity.this.playTone(ToneGenerator.TONE_DTMF_0, true);
-                                data.resetStreak();
-                                MainActivity.this.showRestart(LOSE);
+                                if (data.getStarsAvailable() > 0) {
+                                    data.decrementStarsAvailable();
+                                    invalidateOptionsMenu();
+                                } else {
+                                    data.resetStreak();
+                                    data.resetStars();
+                                    MainActivity.this.showRestart(LOSE);
+                                }
                             }
                         }
                         return true;
@@ -165,13 +169,14 @@ public class MainActivity extends AppCompatActivity {
         }
         int timeTaken = (int) TimeUnit.MILLISECONDS.toSeconds(new Date().getTime() - startTime);
         boolean createdRecord = false;
+        int previousRecord = data.getFastestTime();
         if (status == WIN) {
             data.incrementStreak();
             createdRecord = data.updateFastestTime(timeTaken);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
-        builder.setMessage(status == WIN ? String.format(Locale.ENGLISH, getString(createdRecord ? R.string.success_message_record : R.string.success_message), timeTaken, data.getFastestTime()) : getString(R.string.game_over_message));
+        builder.setMessage(status == WIN ? String.format(Locale.ENGLISH, getString(createdRecord ? R.string.success_message_record : R.string.success_message), timeTaken, previousRecord) : getString(R.string.game_over_message));
         builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak()) : "😖 Game over!");
         builder.setPositiveButton("Yes", (dialogInterface, i) -> resetGrid());
 
@@ -189,6 +194,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.game_menu, menu);
+        int nStars = data.getStarsAvailable();
+        if (nStars < 2) {
+            menu.findItem(R.id.menu_star_1).setVisible(false);
+        }
+        if (nStars < 1) {
+            menu.findItem(R.id.menu_star_2).setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -196,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_reload) {
             data.resetStreak();
+            data.resetStars();
             resetGrid();
         }
         if (item.getItemId() == R.id.menu_language) {
