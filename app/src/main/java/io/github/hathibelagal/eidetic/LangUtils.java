@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class LangUtils {
 
-    private static HashMap<Integer, String[]> languageMap;
+    private static final HashMap<Integer, String[]> languageMap;
 
     static {
         languageMap = new HashMap<>();
