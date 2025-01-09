@@ -2,6 +2,7 @@ package io.github.hathibelagal.eidetic;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.ToneGenerator;
@@ -33,11 +34,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int WIN = 1;
     private static final int LOSE = 0;
     private final int MAX_VALUE = 9;
-    final private int nRows = 6;
-    final private int nCols = 3;
-    final private ArrayList<Button> buttons = new ArrayList<>(9);
-    final private List<Integer> sequence = IntStream.range(1, 10).boxed().collect(Collectors.toList());
-    final private ToneGenerator toneGenerator = new ToneGenerator(ToneGenerator.TONE_DTMF_0, 70);
+    private final int MAX_VOLUME = 90;
+    private final int nRows = 6;
+    private final int nCols = 3;
+    private final ArrayList<Button> buttons = new ArrayList<>(9);
+    private final List<Integer> sequence = IntStream.range(1, 10).boxed().collect(Collectors.toList());
+    private final ToneGenerator toneGenerator = new ToneGenerator(ToneGenerator.TONE_DTMF_0, MAX_VOLUME);
     private boolean gameStarted = false;
     private int expectedNumber = 1;
     private GridLayout grid;
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private long startTime = 0;
 
     private SavedData data;
+
+    private Speaker speaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
         data = new SavedData(this);
         grid = findViewById(R.id.grid);
         gridContainer = findViewById(R.id.grid_container);
+
+        speaker = new Speaker(this);
+
         resetGrid();
     }
 
@@ -170,19 +177,32 @@ public class MainActivity extends AppCompatActivity {
         int timeTaken = (int) TimeUnit.MILLISECONDS.toSeconds(new Date().getTime() - startTime);
         boolean createdRecord = false;
         int previousRecord = data.getFastestTime();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
         if (status == WIN) {
             data.incrementStreak();
             createdRecord = data.updateFastestTime(timeTaken);
+            builder.setNeutralButton("Speak 👄", null);
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(false);
         builder.setMessage(status == WIN ? String.format(Locale.ENGLISH, getString(createdRecord ? R.string.success_message_record : R.string.success_message), timeTaken, previousRecord) : getString(R.string.game_over_message));
         builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak()) : "😖 Game over!");
         builder.setPositiveButton("Yes", (dialogInterface, i) -> resetGrid());
-
         builder.setNegativeButton("No", (dialogInterface, i) -> finish());
 
-        builder.create().show();
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button info = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                info.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        speaker.say(String.format(Locale.ENGLISH, getString(R.string.time_taken_announcement), timeTaken));
+                    }
+                });
+            }
+        });
+        dialog.show();
     }
 
     private void activatePuzzleMode() {
@@ -238,5 +258,13 @@ public class MainActivity extends AppCompatActivity {
         c.fontScale = 1.0f;
         applyOverrideConfiguration(c);
         super.attachBaseContext(newBase);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(speaker != null) {
+            speaker.releaseResources();
+        }
+        super.onDestroy();
     }
 }
