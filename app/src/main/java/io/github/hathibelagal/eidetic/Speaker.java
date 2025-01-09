@@ -23,7 +23,6 @@ public class Speaker implements TextToSpeech.OnInitListener {
         if(i == TextToSpeech.SUCCESS) {
             if(tts.setLanguage(Locale.ENGLISH) == TextToSpeech.LANG_AVAILABLE) {
                 tts.setSpeechRate(1.2f);
-                Toast.makeText(context, context.getString(R.string.tts_ready), Toast.LENGTH_SHORT).show();
                 ttsReady = true;
                 say(context.getString(R.string.tts_ready));
             }
