@@ -16,7 +16,7 @@ The hope is that we can eventually match or beat chimp records.
 
 - Numbers from 1 to 9 are displayed randomly
 - You must memorize the positions of the numbers
-- Once you press **1**. all buttons display a **?**
+- Once you press **1**, all buttons display a **?**
 - You need to then use your memory to press **2**, **3**, ... **9**.
 - It's game over if you press the wrong button.
 
