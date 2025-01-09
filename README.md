@@ -20,6 +20,8 @@ The hope is that we can eventually match or beat chimp records.
 - You need to then use your memory to press **2**, **3**, ... **9**.
 - It's game over if you press the wrong button.
 
+*To make things slightly easier, this app gives you two stars(you can see them in the appbar). Anytime you make a mistake, a star is consumed. Once you don't have any stars left, it's game over.*
+
 ## Screenshots
 
 We support multiple scripts.
