@@ -17,7 +17,6 @@ package io.github.hathibelagal.eidetic;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.ToneGenerator;
@@ -205,17 +204,9 @@ public class MainActivity extends AppCompatActivity {
         builder.setNegativeButton("No", (dialogInterface, i) -> finish());
 
         AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                Button info = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-                info.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        speaker.say(String.format(Locale.ENGLISH, getString(R.string.time_taken_announcement), timeTaken));
-                    }
-                });
-            }
+        dialog.setOnShowListener(dialogInterface -> {
+            Button info = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            info.setOnClickListener(view -> speaker.say(String.format(Locale.ENGLISH, getString(R.string.time_taken_announcement), timeTaken)));
         });
         dialog.show();
     }
