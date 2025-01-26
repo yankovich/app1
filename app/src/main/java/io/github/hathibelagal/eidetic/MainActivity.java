@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -193,11 +194,15 @@ public class MainActivity extends AppCompatActivity {
         int previousRecord = data.getFastestTime();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
+
         if (status == WIN) {
             data.incrementStreak();
             createdRecord = data.updateFastestTime(timeTaken);
             builder.setNeutralButton("Speak 👄", null);
         }
+
+        data.updateStats(status == WIN);
+
         builder.setMessage(status == WIN ? String.format(Locale.ENGLISH, getString(createdRecord ? R.string.success_message_record : R.string.success_message), timeTaken, previousRecord) : getString(R.string.game_over_message));
         builder.setTitle(status == WIN ? String.format(Locale.ENGLISH, "🤩 You win!\n🙌 Streak: %d", data.getStreak()) : "😖 Game over!");
         builder.setPositiveButton("Yes", (dialogInterface, i) -> resetGrid());
@@ -236,9 +241,10 @@ public class MainActivity extends AppCompatActivity {
             data.resetStreak();
             data.resetStars();
             resetGrid();
-        }
-        if (item.getItemId() == R.id.menu_language) {
+        } else if (item.getItemId() == R.id.menu_language) {
             showChangeLanguageDialog();
+        } else if (item.getItemId() == R.id.menu_stats) {
+            showStatsDialog();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -258,6 +264,25 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
+    private void showStatsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Your stats");
+        builder.setPositiveButton("Close", null);
+        Map<String, Integer> stats = data.getStats();
+        List<CharSequence> statItems = new ArrayList<>();
+        Integer nGames = stats.get("N_GAMES");
+        Integer nWins = stats.get("N_WON");
+        if (nGames == null || nWins == null) {
+            return;
+        }
+        Float winRate = (float) (100.0 * nWins / nGames);
+        statItems.add(String.format(Locale.ENGLISH, "Total games played: %d", nGames));
+        statItems.add(String.format(Locale.ENGLISH, "Number of wins: %d", nWins));
+        statItems.add(String.format(Locale.ENGLISH, "Win rate: %.2f %%", winRate));
+        builder.setItems(statItems.toArray(new CharSequence[0]), null);
+        builder.create().show();
+    }
+
     @Override
     protected void attachBaseContext(Context newBase) {
         Configuration c = new Configuration(newBase.getResources().getConfiguration());
@@ -268,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if(speaker != null) {
+        if (speaker != null) {
             speaker.releaseResources();
         }
         super.onDestroy();

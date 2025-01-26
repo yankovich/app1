@@ -9,4 +9,5 @@
     <string name="menu_star_2">Star 2</string>
     <string name="tts_ready">Let\'s go!</string>
     <string name="time_taken_announcement">You win! You completed the task in %d seconds.</string>
+    <string name="menu_stats_title">Stats</string>
 </resources>

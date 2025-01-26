@@ -15,4 +15,9 @@
         android:title="@string/menu_change_language_title"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/menu_stats"
+        android:title="@string/menu_stats_title"
+        app:showAsAction="never"
+        />
 </menu>

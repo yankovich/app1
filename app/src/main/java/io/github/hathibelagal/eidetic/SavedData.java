@@ -20,6 +20,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SavedData {
 
     private final int MAX_STARS = 2;
@@ -32,6 +35,24 @@ public class SavedData {
     void incrementStreak() {
         int currentStreak = prefs.getInt("STREAK", 0) + 1;
         prefs.edit().putInt("STREAK", currentStreak).apply();
+    }
+
+    void updateStats(boolean won) {
+        int nGames = prefs.getInt("N_GAMES", 0) + 1;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("N_GAMES", nGames);
+        if(won) {
+            int nWon = prefs.getInt("N_WON", 0) + 1;
+            editor.putInt("N_WON", nWon);
+        }
+        editor.apply();
+    }
+
+    Map<String, Integer> getStats() {
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("N_GAMES", prefs.getInt("N_GAMES", 0));
+        stats.put("N_WON", prefs.getInt("N_WON", 0));
+        return stats;
     }
 
     int getLanguage() {
