@@ -20,7 +20,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.ToneGenerator;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -66,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Speaker speaker;
 
+    private String additionalSpeech;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         createButtons();
         expectedNumber = 1;
         gameStarted = false;
+        additionalSpeech = "";
     }
 
     private void generateSequence() {
@@ -203,6 +208,9 @@ public class MainActivity extends AppCompatActivity {
         if (status == WIN) {
             data.incrementStreak();
             createdRecord = data.updateFastestTime(timeTaken);
+
+            updateAdditionalSpeech(createdRecord, timeTaken);
+
             builder.setNeutralButton("Speak 👄", null);
         }
 
@@ -219,9 +227,30 @@ public class MainActivity extends AppCompatActivity {
             if (!data.areSoundsOn()) {
                 info.setEnabled(false);
             }
-            info.setOnClickListener(view -> speaker.say(String.format(Locale.ENGLISH, getString(R.string.time_taken_announcement), timeTaken)));
+            info.setOnClickListener(view -> speaker.say(String.format(Locale.ENGLISH, getString(R.string.tts_time_taken), timeTaken) + ". " + additionalSpeech));
         });
         dialog.show();
+    }
+
+    private void updateAdditionalSpeech(boolean createdRecord, int timeTaken) {
+        if(createdRecord) {
+            additionalSpeech += "You have created a new record! ";
+        }
+        if(data.getStreak() == 5) {
+            additionalSpeech += getString(R.string.tts_streak5);
+        }
+        if(data.getStreak() == 10) {
+            additionalSpeech += getString(R.string.tts_streak10);
+        }
+        if(data.getStreak() == 25) {
+            additionalSpeech += getString(R.string.tts_streak25);
+        }
+        if(timeTaken == 5) {
+            additionalSpeech += getString(R.string.tts_so_fast);
+        }
+        if(timeTaken < 5) {
+            additionalSpeech += getString(R.string.tts_super_fast);
+        }
     }
 
     private void activatePuzzleMode() {
