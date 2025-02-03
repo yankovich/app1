@@ -1,0 +1,2 @@
+- Added an option to turn sounds off
+- More details when "speak" pressed

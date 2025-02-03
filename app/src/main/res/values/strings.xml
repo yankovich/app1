@@ -17,4 +17,5 @@
     <string name="tts_streak5">Five in a row. Cool!</string>
     <string name="tts_streak10">Ten in a row. That\'s a milestone!</string>
     <string name="tts_streak25">Twenty five in a row. You seem to have mastered this!</string>
+    <string name="tts_new_record">"You have created a new record! "</string>
 </resources>

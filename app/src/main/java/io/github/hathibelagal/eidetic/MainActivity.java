@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateAdditionalSpeech(boolean createdRecord, int timeTaken) {
         if(createdRecord) {
-            additionalSpeech += "You have created a new record! ";
+            additionalSpeech += getString(R.string.tts_new_record);
         }
         if(data.getStreak() == 5) {
             additionalSpeech += getString(R.string.tts_streak5);
