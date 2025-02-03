@@ -17,6 +17,7 @@ package io.github.hathibelagal.eidetic;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,8 +29,11 @@ public class Speaker implements TextToSpeech.OnInitListener {
     private final TextToSpeech tts;
     private boolean ttsReady = false;
     private final Activity context;
-    public Speaker(Activity context) {
+
+    private SavedData data;
+    public Speaker(Activity context, SavedData data) {
         this.context = context;
+        this.data = data;
         tts = new TextToSpeech(context, this);
     }
 
@@ -45,6 +49,9 @@ public class Speaker implements TextToSpeech.OnInitListener {
     }
 
     public void say(String s) {
+        if(!data.areSoundsOn()) {
+            return;
+        }
         if(!ttsReady) { return; }
         tts.speak(s, TextToSpeech.QUEUE_FLUSH, null, null);
     }
