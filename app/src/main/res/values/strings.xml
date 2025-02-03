@@ -8,8 +8,13 @@
     <string name="menu_star_1">Star 1</string>
     <string name="menu_star_2">Star 2</string>
     <string name="tts_ready">Let\'s go!</string>
-    <string name="time_taken_announcement">You win! You completed the task in %d seconds.</string>
+    <string name="tts_time_taken">You win! You completed the task in %d seconds.</string>
     <string name="menu_stats_title">Stats</string>
     <string name="menu_sfx_off_title">Turn sounds off</string>
     <string name="menu_sfx_on_title">Turn sounds on</string>
+    <string name="tts_so_fast">Wow, that was so fast!</string>
+    <string name="tts_super_fast">Awesome, that was super fast!</string>
+    <string name="tts_streak5">Five in a row. Cool!</string>
+    <string name="tts_streak10">Ten in a row. That\'s a milestone!</string>
+    <string name="tts_streak25">Twenty five in a row. You seem to have mastered this!</string>
 </resources>
