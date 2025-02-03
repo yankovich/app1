@@ -37,11 +37,20 @@ public class SavedData {
         prefs.edit().putInt("STREAK", currentStreak).apply();
     }
 
+    boolean areSoundsOn() {
+        return prefs.getBoolean("SFX", true);
+    }
+
+    @SuppressLint("ApplySharedPref")
+    void toggleSounds() {
+        prefs.edit().putBoolean("SFX", !areSoundsOn()).commit();
+    }
+
     void updateStats(boolean won) {
         int nGames = prefs.getInt("N_GAMES", 0) + 1;
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("N_GAMES", nGames);
-        if(won) {
+        if (won) {
             int nWon = prefs.getInt("N_WON", 0) + 1;
             editor.putInt("N_WON", nWon);
         }

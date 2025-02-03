@@ -10,4 +10,6 @@
     <string name="tts_ready">Let\'s go!</string>
     <string name="time_taken_announcement">You win! You completed the task in %d seconds.</string>
     <string name="menu_stats_title">Stats</string>
+    <string name="menu_sfx_off_title">Turn sounds off</string>
+    <string name="menu_sfx_on_title">Turn sounds on</string>
 </resources>

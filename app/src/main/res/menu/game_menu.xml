@@ -20,4 +20,9 @@
         android:title="@string/menu_stats_title"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/menu_sfx"
+        android:title="@string/menu_sfx_off_title"
+        app:showAsAction="never"
+        />
 </menu>

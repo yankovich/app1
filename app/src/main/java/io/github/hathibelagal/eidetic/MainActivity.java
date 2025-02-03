@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         grid = findViewById(R.id.grid);
         gridContainer = findViewById(R.id.grid_container);
 
-        speaker = new Speaker(this);
+        speaker = new Speaker(this, data);
 
         resetGrid();
     }
@@ -132,7 +132,9 @@ public class MainActivity extends AppCompatActivity {
                     b.setOnTouchListener((view, motionEvent) -> {
                         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                             if (!gameStarted && b.getValue() != expectedNumber) {
-                                toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
+                                if (data.areSoundsOn()) {
+                                    toneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 30);
+                                }
                                 Toast.makeText(MainActivity.this, "Please start with 1", Toast.LENGTH_SHORT).show();
                                 return true;
                             }
@@ -179,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void playTone(int tone, boolean isLong) {
+        if (!data.areSoundsOn()) {
+            return;
+        }
         toneGenerator.stopTone();
         toneGenerator.startTone(tone, isLong ? 200 : 100);
     }
@@ -211,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(dialogInterface -> {
             Button info = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            if (!data.areSoundsOn()) {
+                info.setEnabled(false);
+            }
             info.setOnClickListener(view -> speaker.say(String.format(Locale.ENGLISH, getString(R.string.time_taken_announcement), timeTaken)));
         });
         dialog.show();
@@ -232,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
         if (nStars < 1) {
             menu.findItem(R.id.menu_star_2).setVisible(false);
         }
+        boolean sfx = data.areSoundsOn();
+        menu.findItem(R.id.menu_sfx).setTitle(sfx ? getString(R.string.menu_sfx_off_title) : getString(R.string.menu_sfx_on_title));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -245,6 +255,9 @@ public class MainActivity extends AppCompatActivity {
             showChangeLanguageDialog();
         } else if (item.getItemId() == R.id.menu_stats) {
             showStatsDialog();
+        } else if (item.getItemId() == R.id.menu_sfx) {
+            data.toggleSounds();
+            invalidateOptionsMenu();
         }
         return super.onOptionsItemSelected(item);
     }
