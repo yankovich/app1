@@ -3,6 +3,12 @@
 Eidetic is an app for improving and testing your working memory. All you need to do is press the buttons in the right order.
 It's harder than it looks.
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/io.github.hathibelagal.eidetic/)
+
+Or download the latest APK from the [Releases Section](https://github.com/hathibelagal-dev/Eidetic-Memory-Trainer/releases/latest).
+
 ## Background
 
 The chimp test, also known as the Ayumu memory test, is a test designed to assess working memory.
