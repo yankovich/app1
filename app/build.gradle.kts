@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "io.github.hathibelagal.eidetic"
+    namespace = "io.github.hathibelagal.brainboost"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "io.github.hathibelagal.eidetic"
+        applicationId = "io.github.hathibelagal.brainboost"
         minSdk = 26
         targetSdk = 34
         versionCode = 5

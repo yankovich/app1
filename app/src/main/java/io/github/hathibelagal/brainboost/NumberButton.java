@@ -13,18 +13,13 @@
  * limitations under the License.
  */
 
-package io.github.hathibelagal.eidetic;
+package io.github.hathibelagal.brainboost;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.media.ToneGenerator;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.content.res.ResourcesCompat;
 
 public class NumberButton extends androidx.appcompat.widget.AppCompatButton {
 

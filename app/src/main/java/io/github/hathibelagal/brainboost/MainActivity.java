@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-package io.github.hathibelagal.eidetic;
+package io.github.hathibelagal.brainboost;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.ToneGenerator;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package io.github.hathibelagal.eidetic;
+package io.github.hathibelagal.brainboost;
 
 import java.util.HashMap;
 import java.util.Objects;

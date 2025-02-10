@@ -13,17 +13,12 @@
  * limitations under the License.
  */
 
-package io.github.hathibelagal.eidetic;
+package io.github.hathibelagal.brainboost;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Locale;
-import java.util.Set;
 
 public class Speaker implements TextToSpeech.OnInitListener {
     private final TextToSpeech tts;

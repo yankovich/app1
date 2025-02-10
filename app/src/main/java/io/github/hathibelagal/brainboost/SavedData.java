@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package io.github.hathibelagal.eidetic;
+package io.github.hathibelagal.brainboost;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

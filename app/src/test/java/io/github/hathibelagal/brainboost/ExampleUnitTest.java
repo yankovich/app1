@@ -1,4 +1,4 @@
-package io.github.hathibelagal.eidetic;
+package io.github.hathibelagal.brainboost;
 
 import org.junit.Test;
 
